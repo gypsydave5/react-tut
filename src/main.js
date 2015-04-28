@@ -1,14 +1,20 @@
 var React = require('react');
 var Marked = require('marked');
 
+var data = [
+  {author: "Pete Hunt", text: "This is one comment", id: 1},
+  {author: "Jordan Walke", text: "This is *another* comment", id: 2}
+];
+
 var Comment = React.createClass({
   render: function () {
+    var rawMarkup = Marked(this.props.children.toString(), {sanitize: true});
     return (
       <div className="comment">
         <h2 className="commentAuthor">
           {this.props.author}
         </h2>
-        {this.props.children}
+        <span dangerouslySetInnerHTML={{__html: rawMarkup}} />
       </div>
     );
   }
@@ -16,10 +22,16 @@ var Comment = React.createClass({
 
 var CommentList = React.createClass({
   render: function () {
+    var commentNodes = this.props.data.map(function (comment) {
+      return (
+        <Comment key={comment.id} author={comment.author}>
+          {comment.text}
+        </Comment>
+      )
+    });
     return (
       <div className="commentList">
-        <Comment author="Pete Hunt">This is a comment</Comment>
-        <Comment author="Jordan Walke">Thir is *another* comment</Comment>
+        {commentNodes}
       </div>
     );
   }
@@ -40,7 +52,7 @@ var CommentBox = React.createClass({
     return (
       <div className="commentBox">
       <h1>Comments</h1>
-      <CommentList />
+      <CommentList data={this.props.data} />
       <CommentForm />
       </div>
     );
@@ -48,6 +60,6 @@ var CommentBox = React.createClass({
 });
 
 React.render(
-  <CommentBox />,
+  <CommentBox data={data}/>,
   document.getElementById('content')
 );
