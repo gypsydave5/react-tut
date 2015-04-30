@@ -46,7 +46,7 @@ var CommentForm = React.createClass({
     if (!text || !author) {
       return;
     }
-    // - send the comment to the server aroundabout here...
+    this.props.onCommentSubmit({author: author, text: text});
     React.findDOMNode(this.refs.author).value = '';
     React.findDOMNode(this.refs.text).value = '';
     return;
@@ -78,6 +78,20 @@ var CommentBox = React.createClass({
       }.bind(this)
     });
   },
+  handleCommentSubmit: function(comment) {
+    $.ajax({
+      url: this.props.url,
+      dataType: 'json',
+      type: 'POST',
+      data: comment,
+      success: function(data) {
+        this.setState({data: data});
+      }.bind(this),
+      error: function(xhr, status, error) {
+        console.error(this.props.url, status, error.toString());
+      }.bind(this)
+    });
+  },
   componentDidMount: function() {
     this.loadCommentsFromServer();
     setInterval(this.loadCommentsFromServer, this.props.pollInterval);
@@ -87,7 +101,7 @@ var CommentBox = React.createClass({
       <div className="commentBox">
       <h1>Comments</h1>
       <CommentList data={this.state.data} />
-      <CommentForm />
+      <CommentForm onCommentSubmit={this.handleCommentSubmit} />
       </div>
     );
   }
