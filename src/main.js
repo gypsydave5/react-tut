@@ -2,11 +2,6 @@ var React = require('react');
 var Marked = require('marked');
 var $ = require('jquery');
 
-var data = [
-  {author: "Pete Hunt", text: "This is one comment", id: 1},
-  {author: "Jordan Walke", text: "This is *another* comment", id: 2}
-];
-
 var Comment = React.createClass({
   render: function () {
     var rawMarkup = Marked(this.props.children.toString(), {sanitize: true});
@@ -39,7 +34,7 @@ var CommentList = React.createClass({
 });
 
 var CommentForm = React.createClass({
-  handleSubmit: function(e) {
+  handleSubmit: function (e) {
     e.preventDefault();
     var author = React.findDOMNode(this.refs.author).value.trim();
     var text = React.findDOMNode(this.refs.text).value.trim();
@@ -63,10 +58,10 @@ var CommentForm = React.createClass({
 });
 
 var CommentBox = React.createClass({
-  getInitialState: function() {
+  getInitialState: function () {
     return {data:  []};
   },
-  loadCommentsFromServer: function() {
+  loadCommentsFromServer: function () {
     $.ajax({
       url: this.props.url,
       dataType: 'json',
@@ -78,7 +73,10 @@ var CommentBox = React.createClass({
       }.bind(this)
     });
   },
-  handleCommentSubmit: function(comment) {
+  handleCommentSubmit: function (comment) {
+    var comments = this.state.data;
+    var newComments = comments.concat([comment]);
+    this.setState({data: newComments});
     $.ajax({
       url: this.props.url,
       dataType: 'json',
@@ -92,7 +90,7 @@ var CommentBox = React.createClass({
       }.bind(this)
     });
   },
-  componentDidMount: function() {
+  componentDidMount: function () {
     this.loadCommentsFromServer();
     setInterval(this.loadCommentsFromServer, this.props.pollInterval);
   },
@@ -108,6 +106,6 @@ var CommentBox = React.createClass({
 });
 
 React.render(
-  <CommentBox url="comments.json" pollInterval={2000}/>,
+  <CommentBox url="comments.json" pollInterval={10000}/>,
   document.getElementById('content')
 );
