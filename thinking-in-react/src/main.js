@@ -26,12 +26,17 @@ var ProductRow = React.createClass({
   }
 });
 
+function productFiltered (product) {
+  return product.name.indexOf(this.props.filterText) === -1 ||
+    (!product.stocked && this.props.inStockOnly)
+};
+
 var ProductTable = React.createClass({
   render: function () {
     var rows = [];
     var lastCategory = null;
     this.props.products.forEach(function (product) {
-      if (product.name.indexOf(this.props.filterText) === -1 || (!product.stocked && this.props.inStockOnly)) {
+      if (productFiltered.bind(this)(product)) {
         return;
       }
       if (product.category !== lastCategory) {
